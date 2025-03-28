@@ -1,7 +1,9 @@
 using LinearAlgebra
+using Base.Threads
 
 using Logging
 Logging.global_logger(ConsoleLogger(Logging.Debug))
+
 
 function distance(x,y,z)
     """
@@ -27,39 +29,59 @@ function charge(x,y,z)
 end
 
 function calculate_sum(n)
-    sum = 0
+    sum = Atomic{Float64}(0.0)  # Atomic variable to allow concurrent modification
     ub =  ceil((n-1)/2)
     lb = -floor((n-1)/2)
 
-    #@debug "" ub lb
+    #@debug "lower and upper iteration bounds" lb ub
 
-    for x in lb:ub
+    @threads for x in lb:ub
+        sub_sum = 0
         for y in lb:ub
             for z in lb:ub
                 if x == 0 && y == 0 && z == 0
                     continue
                 end
-                #@debug "" x y z charge(x,y,z) distance(x,y,z) sum
-                sum += charge(x,y,z)/distance(x,y,z)
+                #=@debug ("current position in cristal, charge at this position,"*
+                   " distance at this point and the current sum",
+                   x, y, z, charge(x,y,z), distance(x,y,z), sum) =#
+                sub_sum += charge(x,y,z)/distance(x,y,z)
             end
         end
+        atomic_add!(sum, sub_sum)
     end
-    sum
+    sum[]
 end
 
-function iterate()
+function iterate(start_value=3)
     current = 0
     prev = 0
-    for i in 3:2_000
-        current = calculate_sum(i)
-        @debug "" i current - prev
+    for i in start_value:10_000+start_value
+        current, dt = let
+            t0 = time()
+            tmp = calculate_sum(i)
+            tmp, time() - t0
+        end
+        @debug "Iteration and Δ between iterations" i current - prev
+        @debug "iteration took" dt
         if abs(current - prev) < 1e-4
             break
         end
-        @debug current
+        @debug "Current Value" current
         prev = current
     end
     current
 end
 
-println(iterate())
+try
+    @debug ARGS
+    start_value = if length(ARGS) >= 1
+        parse(Int, ARGS[1])
+    else 3 end
+
+    @assert start_value >= 3
+    println(iterate(start_value))
+catch e
+    e isa InterruptException && exit(138)
+    rethrow(e)
+end
