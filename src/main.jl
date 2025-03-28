@@ -53,7 +53,7 @@ function iterate()
     for i in 3:2_000
         current = calculate_sum(i)
         @debug "" i current - prev
-        if abs(current - prev) < 1e-3
+        if abs(current - prev) < 1e-4
             break
         end
         @debug current
