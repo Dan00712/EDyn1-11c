@@ -5,17 +5,18 @@ include(joinpath(
                  dirname(@__FILE__),
                  "funcs.jl"
                 ))
-using .funcs: calculatesum, normalizer
+using .funcs: calculatesum_primitive, normalizer
 
 @debug ARGS
 n0 = if length(ARGS) >= 1
     parse(Int, ARGS[1])
-else 4 end
+else 3 end
 
-@assert n0 >= 4
-V0 = calculatesum(n0-2)
+@assert n0 >= 3
+V0 = calculatesum_primitive(n0-2)
+V0 
 println("V₀=\t$(V0)")
-V1 = calculatesum(n0)
+V1 = calculatesum_primitive(n0)
 println("V₁=\t$(V1)")
 
 Δ = abs(V1-V0)

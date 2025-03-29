@@ -4,7 +4,7 @@ using Base.Threads
 
 using ProgressBars
 
-public calculatesum, normalizer
+public calculatesum_primitive, calculatesum_evjen , normalizer, iterate
 
 function distance(x,y,z)
     """
@@ -29,7 +29,44 @@ function charge(x,y,z)
     end
 end
 
-function calculatesum(n)
+function scaling_id(args...; kwargs...)
+    1
+end
+
+function scaling_evjen(x,y,z; ub, lb)
+    2.0^(-((([x, y, z] .== ub) .|| ([x,y,z] .== lb)) |> sum))
+end
+
+function calculatesum(n, scalingfunc=scaling_id)
+    """
+    Calculates the total Potential Energy, 
+        relative to two adjacent Atoms.
+    This algorithm is parallelize using the built in threading Library of julia.
+    For the multithreading to be efficient the --threads or -t parameter needs to be set.
+    To allow for maximum speedup the parameter should be \$(nprocs).
+
+    This function is general and allows for a scaling function to be applied, to switch between approaches.
+    With scaling_id this takes the primitive approach of summing all the potentials
+    With scaling_evjen this takes the form of the evjen method that converges faster
+    """
+    sum = Atomic{Float64}(0.0)  # Atomic variable to allow concurrent modification
+    ub =  ceil((n-1)/2)         # upper bound for iteration
+    lb = -floor((n-1)/2)        # lower bound for iteration
+
+    @threads for x in ProgressBar(lb:ub)
+        local sub_sum = 0
+        for y in lb:ub, z in lb:ub
+            if x == 0 && y == 0 && z == 0
+                continue
+            end
+            sub_sum += scalingfunc(x,y,z; ub=ub, lb=lb)  *charge(x,y,z)/distance(x,y,z)
+        end
+        atomic_add!(sum, sub_sum)
+    end
+    sum[]
+end
+
+function calculatesum_primitive(n)
     """
     Calculates the total Potential Energy, 
         relative to two adjacent Atoms.
@@ -42,26 +79,12 @@ function calculatesum(n)
     There are more elegant and more importantly faster converging methods
     such as the 'Ewald-Method' or the 'Evjen-Method'.
     """
-    sum = Atomic{Float64}(0.0)  # Atomic variable to allow concurrent modification
-    ub =  ceil((n-1)/2)
-    lb = -floor((n-1)/2)
+    calculatesum(n, scaling_id)
+end
 
-    #@debug "lower and upper iteration bounds" lb ub
+function calculatesum_evjen(n)
 
-    @threads for x in ProgressBar(lb:ub)
-        local sub_sum = 0
-        for y in lb:ub, z in lb:ub
-            if x == 0 && y == 0 && z == 0
-                continue
-            end
-            #=@debug ("current position in cristal, charge at this position,"*
-               " distance at this point and the current sum",
-               x, y, z, charge(x,y,z), distance(x,y,z), sum) =#
-            sub_sum += charge(x,y,z)/distance(x,y,z)
-        end
-        atomic_add!(sum, sub_sum)
-    end
-    sum[]
+    calculatesum(n, scaling_evjen)
 end
 
 function normalizer(val) 
@@ -72,4 +95,36 @@ function normalizer(val)
      """
     10^floor(log(10, val))             
 end
+
+
+function iterate(start_value=5; func=calculatesum_primitive)
+    current = 0
+    prev = func(start_value-1)
+
+    # use a step of 2 for an equal number of points on each side, 
+    # the Δ is artificially boosted by alternating between balanced and unbalanced sides
+    for i in start_value:2:10_000+start_value
+        current, dt = let
+            t0 = time()
+            tmp = func(i)
+            tmp, time() - t0
+        end
+        @debug "Iteration and Δ between iterations" i current - prev
+        @debug "iteration took" dt
+
+        normalized = abs(current - prev)/normalizer(current)
+        if normalized < 5e-4    # 5e-4 is used to get below the rounding error
+            break
+        end
+        @debug "Current Value" current
+        prev = current
+
+        if i == 10_000+start_value  # if this point is reached, the series did not converge
+            @error "does not convergend in allowed range" current i
+            current = nothing
+        end
+    end
+    current
+end
+
 end
