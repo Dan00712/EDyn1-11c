@@ -1,0 +1,17 @@
+#!/bin/env bash
+
+for arg in "$@";do
+    if [ "$arg" = "-h" ] || [ "$arg" = "--help" ]; then
+        echo "Calculates all the Grid Energies until it converges to three significant digits"
+        echo ""
+        echo "usage:"
+        echo "iterated approach [ARGS...]"
+        echo ""
+        echo "all arguments passed in will be directly forwarded to julia"
+        echo "for an extensive list look at julia --help"
+        exit 0
+    fi
+done
+
+julia --project=. -e 'using Pkg; Pkg.instantiate()'
+julia $@ --project=. src/main.evjen.jl

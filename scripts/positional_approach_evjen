@@ -1,0 +1,21 @@
+#!/bin/env bash
+
+for arg in "$@";do
+    if [ "$arg" = "-h" ] || [ "$arg" = "--help" ]; then
+        echo "Calculates the Grid Energies of the last argument and the previous value"
+        echo "If the energies have converged up to three significant digits,"
+        echo "the Energies are assumend to have converged up to three digits"
+        echo ""
+        echo "usage:"
+        echo "iterated approach [ARGS...] <n>"
+        echo ""
+        echo "n is the size of the grid iteration"
+        echo "all arguments before n will be directly forwarded to julia"
+        echo "for an extensive list look at julia --help"
+        exit 0
+    fi
+done
+val=${@: -1}
+args=${@:1:$#-1}
+julia --project=. -e 'using Pkg; Pkg.instantiate()'
+julia $args --project=. src/main.2.evjen.jl $val
