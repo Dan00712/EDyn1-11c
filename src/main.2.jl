@@ -1,6 +1,7 @@
-using Logging
-Logging.global_logger(ConsoleLogger(Logging.Debug))
-
+include(joinpath(
+                 dirname(@__FILE__),
+                 "logging_config.jl"
+                ))
 include(joinpath(
                  dirname(@__FILE__),
                  "funcs.jl"
