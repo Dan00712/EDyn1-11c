@@ -25,6 +25,11 @@ function iterate(start_value=3)
         end
         @debug "Current Value" current
         prev = current
+
+        if i == 10_000+start_value  # if this point is reached, the series did not converge
+            println(current)
+            current = nothing
+        end
     end
     current
 end
@@ -36,7 +41,7 @@ try
     else 3 end
 
     @assert start_value >= 3
-    println(iterate(start_value))
+    println("konvergent value $(iterate(start_value))")
 catch e
     e isa InterruptException && exit(138)
     rethrow(e)
