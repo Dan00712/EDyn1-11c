@@ -32,10 +32,15 @@ end
 function calculatesum(n)
     """
     Calculates the total Potential Energy, 
-        relative to two adjacent Atoms
-    This algorithm is parallelize using the built in threading Library of julia
-    For the multithreading to be efficient the --threads or -t parameter needs to be set
+        relative to two adjacent Atoms.
+    This algorithm is parallelize using the built in threading Library of julia.
+    For the multithreading to be efficient the --threads or -t parameter needs to be set.
     To allow for maximum speedup the parameter should be \$(nprocs).
+    
+    This approach is taking the rather primitive approach of summing all the potentials with the charge at 0^m.
+    With this primitive approach the Algorithm runs in O(n^3) time, but should run in O(1) space.
+    There are more elegant and more importantly faster converging methods
+    such as the 'Ewald-Method' or the 'Evjen-Method'.
     """
     sum = Atomic{Float64}(0.0)  # Atomic variable to allow concurrent modification
     ub =  ceil((n-1)/2)
