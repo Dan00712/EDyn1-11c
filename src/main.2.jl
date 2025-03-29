@@ -10,9 +10,9 @@ using .funcs: calculatesum_primitive, normalizer
 @debug ARGS
 n0 = if length(ARGS) >= 1
     parse(Int, ARGS[1])
-else 3 end
+else 5 end
 
-@assert n0 >= 3
+@assert n0 >= 5
 V0 = calculatesum_primitive(n0-2)
 V0 
 println("V₀=\t$(V0)")

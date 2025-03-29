@@ -10,11 +10,10 @@ using .funcs: calculatesum_evjen, normalizer
 @debug ARGS
 n0 = if length(ARGS) >= 1
     parse(Int, ARGS[1])
-else 3 end
+else 5 end
 
 @assert n0 >= 3
 V0 = calculatesum_evjen(n0-2)
-V0 
 println("V₀=\t$(V0)")
 V1 = calculatesum_evjen(n0)
 println("V₁=\t$(V1)")
