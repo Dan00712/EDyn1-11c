@@ -13,7 +13,7 @@ n0 = if length(ARGS) >= 1
 else 4 end
 
 @assert n0 >= 4
-V0 = calculatesum(n0-1)
+V0 = calculatesum(n0-2)
 println("V₀=\t$(V0)")
 V1 = calculatesum(n0)
 println("V₁=\t$(V1)")
