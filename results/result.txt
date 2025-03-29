@@ -1,0 +1,8 @@
+For a n of 3999
+V = 1.74785
+For a n of 4000
+V = 1.74756
+0.000289 < 5e-4
+
+Thus one can assume the algorithm has converged up to three digits of precission
+Also the true values of the Madelung constant is 1.74756
