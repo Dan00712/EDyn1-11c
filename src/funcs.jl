@@ -65,7 +65,6 @@ function normalizer(val)
      When writing a number as aE+b, the 1E+b part is calculated,
         and aE+b is thusly divided by 1E+b, to get the normalized a
      """
-
-    10^floor(log(val, 10))             
+    10^floor(log(10, val))             
 end
 end
