@@ -6,7 +6,7 @@ include(joinpath(
                  dirname(@__FILE__),
                  "funcs.jl"
                 ))
-using .funcs: calculatesum_evjen, normalizer
+using .funcs: calculatesum_evjen, normalizer, ATOL
 
 @debug ARGS
 n0 = if length(ARGS) >= 1
@@ -24,7 +24,7 @@ dV = Δ/normalizer(V1)
 println("Δ =\t$(Δ)")
 println("dV =\t$(dV)")
 
-if dV < 5e-4
+if dV < ATOL
     println("solution is excat")
 else
     println("solution is to inexcat")

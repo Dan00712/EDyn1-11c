@@ -6,14 +6,16 @@ using ProgressBars
 
 public calculatesum_primitive, calculatesum_evjen , normalizer, iterate
 
-function iterate(start_value=5; func=calculatesum_primitive)
+const ATOL = 1e-4   # is used to get below the rounding error
+
+function iterate(start_value=5; func=calculatesum_primitive, atol=ATOL)
     """
     increment the number of atoms in each dimension by one until the algorithm has converged to three significant digits
     func may be used to specify the used approach
     currently used algorithms are calculatesum_primitive and calculatesum_evjen
 
     In order to check for convergence it compares the value from the previous iteration
-    and checks if the (normalized, i.e using aE+b => a) distance is smaller than 5e-4.
+    and checks if the (normalized, i.e using aE+b => a) distance is smaller than atol (default $(ATOL)).
     The distance is chosen in order to account for the rounding inexcatness of the next decimal
     """
     current = 0
@@ -27,11 +29,11 @@ function iterate(start_value=5; func=calculatesum_primitive)
             tmp = func(i)
             tmp, time() - t0
         end
-        @debug ("Iteration and Δ|scaled between iterations", i, current - prev, (current-prev)/normalizer(current))
+        @debug "Iteration and Δ|scaled between iterations" i current - prev (current-prev)/normalizer(current)
         @debug "iteration took" dt
 
         normalized = abs(current - prev)/normalizer(current)
-        if normalized < 5e-4    # 5e-4 is used to get below the rounding error
+        if normalized < atol    
             break
         end
         @debug "Current Value" current
