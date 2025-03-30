@@ -10,17 +10,17 @@ V = 1.74735
 
 # Evjen Method
 
-For a n of 9
-V = 1.7477
 For a n of 11
-V = 1.7475
-|delta| = 0.00022 < 5e-4
+V = 1.74750
+For a n of 13
+V = 1.74759
+|delta| = 9.50e-5 < 1e-4
 
 For a n of 99
 V = 1.74756
 For a n of 101
 V = 1.74756
-delta = 1.37E-8 << 5e-4
+delta = 1.37E-8 << 1e-4
 
 
 Thus one can assume the algorithm has converged up to three digits of precission,
