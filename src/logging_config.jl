@@ -1,3 +1,3 @@
 using Logging
-Logging.global_logger(ConsoleLogger(Logging.Debug))
+Logging.global_logger(ConsoleLogger(Logging.Info))
 
