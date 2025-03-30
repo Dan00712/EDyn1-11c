@@ -6,7 +6,7 @@ using ProgressBars
 
 public calculatesum_primitive, calculatesum_evjen , normalizer, iterate
 
-const ATOL = 1e-4   # is used to get below the rounding error
+const ATOL = 1e-3   # is used to get below the rounding error
 
 function iterate(start_value=5; func=calculatesum_primitive, atol=ATOL)
     """
