@@ -1,10 +1,12 @@
 # primitive Method
-For a n of 3999
-V = 1.74727
-For a n of 4001
-V = 1.
-0. < 5e-4
+For the record do not calculate the V for this number with a single thread
+it should take ~ 12 h*thread time to calculate this number
 
+For a n of 5499
+V = 1.74778
+For a n of 4001
+V = 1.74735
+0.00041 < 5e-4
 
 # Evjen Method
 
